@@ -1,0 +1,27 @@
+{
+    "Gases": {
+        "CO2":  { "code": "CO2", "name": "Carbon Dioxide" },
+        "CO2E": { "code": "CO2", "name": "Carbon Dioxide" },
+        "METH": { "code": "CH4", "name": "Methane" },
+        "NOXE": { "code": "N20", "name": "Nitrous Oxide" },
+        "HFCG": { "code": "HFC", "name": "Hydrofluorocarbon" },
+        "SF6G": { "code": "SF6", "name": "Sulfur Hexafluoride" },
+        "PFCG": { "code": "PFC", "name": "Perfluorocarbon" },
+        "GHGT": { "code": "GHG", "name": "Greenhouse Gas" }
+    },
+    "Sectors": {
+        "AG": "Agricultural",
+        "EG": "Energy",
+        "ETOT": "Electricity and Heat Production",
+        "MANF": "Manufacturing Industries and Construction",
+        "BLDG": "Residential Buildings and Services",
+        "TRAN": "Transport",
+        "OTHX": "Other Sectors"
+    },
+    "Types": {
+        "KT": "Kilotons",
+        "ZG": "Percentage Chagne",
+        "ZS": "Percentage of Total",
+        "CE": "CO2 Equivalent"
+    }   
+}
