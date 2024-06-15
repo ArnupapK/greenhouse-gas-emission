@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const config_path = path.join(__dirname, "..", "data_source", "config.json");
+const config_path = path.join(__dirname, "..", "config", "config.json");
 const { Gases, Sectors } = JSON.parse(fs.readFileSync(config_path, "utf-8"));
 
 const Country = require("../models/country");
@@ -10,7 +10,7 @@ const GetEmissionByCountryAndYear = async (req, res) => {
     const { "country": reqCountry, "year": reqYear } = req.query;
 
     if (!reqCountry || !reqYear) {
-        res.status(400).json({ message: "country and year are required." });
+        return res.status(400).json({ message: "country and year are required." });
     }
 
     if (isNaN(reqYear)) {
@@ -29,10 +29,10 @@ const GetEmissionByCountryAndYear = async (req, res) => {
         const emission = await Emission.findOne({ country: country._id, year: reqYear });
         
         if (!emission) {
-            return res.status(400).json({ message: `Emission is not found for ${reqCountry} and ${reqYear}.` });
+            return res.status(400).json({ message: `Emission is not found for '${reqCountry}' and '${reqYear}'.` });
         }
 
-        res.status(200).json({ message: emission.total_value });
+        res.status(200).json({ value: emission.total_value });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -40,9 +40,10 @@ const GetEmissionByCountryAndYear = async (req, res) => {
 
 const GetEmissionBySector = async (req, res) => {
     const { "country": reqCountry, "year": reqYear, "gas": reqGas } = req.query;
+    let returnSectors = [];
 
     if (!reqCountry || !reqYear) {
-        res.status(400).json({ message: "country and year are required." });
+        return res.status(400).json({ message: "country and year are required." });
     }
 
     if (isNaN(reqYear)) {
@@ -61,11 +62,11 @@ const GetEmissionBySector = async (req, res) => {
         const emission = await Emission.findOne({ country: country._id, year: reqYear });
 
         if (!emission) {
-            return res.status(400).json({ message: `Emission is not found for ${reqCountry} and ${reqYear}.` });
+            return res.status(404).json({ message: `Emission is not found for ${reqCountry} and ${reqYear}.` });
         }
 
         if (!emission.gases) {
-            return res.status(400).json({ message: "No emission data for sectors." });
+            return res.status(404).json({ message: "No emission data for sectors." });
         }
 
         if (reqGas) {
@@ -79,109 +80,176 @@ const GetEmissionBySector = async (req, res) => {
                 })
             )
 
-            console.log(sectors);
-
-            res.status(200).json({ sectors: sectors });
+            returnSectors = sectors;
         } else {
             const sectorMap = new Map();
             emission.gases.forEach(gas => {
                 gas.sectors.forEach(sector => {
                     const sectorCode = sector.code;
+                    const sectorValue = sector.value === null ? 0 : sector.value;
                     if (sectorMap.has(sectorCode)) {
-                        sectorMap.get(sectorCode).value += sector.value;
+                        sectorMap.get(sectorCode).value += sectorValue;
                     } else {
                         sectorMap.set(sectorCode, {
                             name: sector.name,
                             code: sector.code,
-                            value: sector.value
+                            value: sectorValue
                         });
                     }
                 })
             });
 
-            res.status(200).json({ message: Array.from(sectorMap.values()) });
+            returnSectors = Array.from(sectorMap.values());
         }
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
+    }
+
+    if (returnSectors.length > 0) {
+        res.status(200).json({ sectors: returnSectors });
+    } else {
+        res.status(404).json({ message: (reqGas) ? `The gas with code '${reqGas}' is not found in database. Please check the code and try again.` : "No sector data found." });
     }
 };
 
-const CreateEmission = async (req, res) => {
-    const { "country": newCountry, "year": newYear, "total_value": newTotalValue, "percent_from_1990": newPercent1990, "gases": newGases } = req.body;
+const GetEmissionTrendByCountry = async (req, res) => {
+    const { "country": reqCountry } = req.query;
+
+    if (!reqCountry) {
+        return res.status(400).json({ message: "country are required." });
+    }
 
     try {
-        if (isNaN(reqYear)) {
-            return res.status(400).json({ message: "year must be number." });
-        }
-
         const country = await Country.findOne({
-            $and: [ { name: newCountry.name }, { code: newCountry.code } ]
+            $or: [ { name: reqCountry }, { code: reqCountry } ]
         });
 
         if (!country) {
             return res.status(404).json({ message: "Country is not found." });
         }
 
-        const emission = await Emission.findOne({ country: country._id, reqYear });
+        const emission = await Emission.find({ country: country._id });
+
+        if(!emission) {
+            return res.status(404).json({ message: `Emission data is not found for '${reqCountry}'.` });
+        }
+
+        const result = emission.map(e => ({
+            year: e.year,
+            percentage: e.percentage_from_1990
+        }))
+
+        res.status(200).json({ trends: result });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const CreateEmission = async (req, res) => {
+    const { "country": newCountry, "year": newYear, "total_value": newTotalValue, "percentage_from_1990": newPercentageFrom1990, "gases": newGases } = req.body;
+
+    if (!newCountry.name || !newCountry.code || !newYear) {
+        return res.status(400).json({ message: "country name, country code and year are required." });
+    }
+
+    if (isNaN(newYear)) {
+        return res.status(400).json({ message: "year must be number." });
+    }
+
+    try {
+        const country = await Country.findOne({ name: newCountry.name, code: newCountry.code });
+
+        if (!country) {
+            return res.status(404).json({ message: "Country is not found." });
+        }
+
+        let emission = await Emission.findOne({ country: country._id, newYear });
 
         if (!emission) {
-            new Emission({
+            emission = new Emission({
                 country: country,
                 year: newYear,
                 total_value: newTotalValue,
-                percentage_from_1990: newPercent1990,
+                percentage_from_1990: newPercentageFrom1990,
                 gases: []
             });
+        } else {
+            emission.total_value =  newTotalValue || emission.total_value;
+            emission.percentage_from_1990 = newPercentageFrom1990 || emission.percentage_from_1990;
         }
-        
-        if (gases) {
-            for (let gas_info of gases) {
-                if (gas_info.code.length !== 3 || gas_info.code !== gas_info.code.toUpperCase()) {
-                    return res.status(400).json({ message: "code in each gas must be exactly 3 characters long and uppercase." });
-                }
 
-                const gas_config = Object.values(Gases).find(g => g.code === gas_info.code);
-                console.log(Gas);
+        for (let newGas of newGases) {
+            if (!newGas.name || !newGas.code) {
+                return res.status(400).json({ message: "Gas name and code are required, when adding a new gas." });
+            }
 
-                // if (!Gas.includes(gas_info.code)) {
-                //     return res.status(400).json({ message: `${gas_info.code} is not in gas list.` });
-                // }
+            if (newGas.code.length !== 3 || newGas.code !== newGas.code.toUpperCase()) {
+                return res.status(400).json({ message: "Gas code must be exactly 3 characters long and uppercase." });
+            }
 
-                const new_gas = Gas({
-                    name: gas_info.name,
-                    code: gas_info.code,
-                    total_value: gas_info.total_value,
-                    percent_from_1990: percent_from_1990,
+            const gasConfig = Object.values(Gases).find(g => g.code === newGas.code);
+
+            if (!gasConfig) {
+                return res.status(404).json({ message: `gas '${newGas.code}' is not available in the gas list.` });
+            }
+
+            let gas = emission.gases.find(g => g.code === newGas.code);
+
+            if (!gas) {
+                gas = Gas({
+                    name: gasConfig.name,
+                    code: newGas.code,
+                    total_value: newGas.total_value,
+                    percentage_from_1990: newGas.percentage_from_1990,
                     sectors: []
                 });
-
-                if (!gas_info.sectors) {
-                    continue;
-                }
-                
-                for (let sector_info of gas_info.sectors) {
-                    const new_sector = Sector({
-                        name: sector_info.name,
-                        code: sector_info.code,
-                        value: sector_info.value,
-                        percentage: sector_info.percentage
-                    });
-
-                }
-
+                emission.gases.push(gas);
+            } else {   
+                gas.name = gasConfig.name;
+                gas.total_value = newGas.total_value || gas.total_value;
+                gas.percentage_from_1990 = newGas.percentage_from_1990 || gas.percentage_from_1990;
             }
-                
-            const gas = new Gas({
-            });
+
+            if (newGas.sectors) {
+                for (let newSector of newGas.sectors.values()) {
+                    if (!newSector.name || !newSector.code) {
+                        return res.status(400).json({ message: "Sector name and code are required, when adding a new sector." });
+                    }
+
+                    if (newSector.code !== newSector.code.toUpperCase()) {
+                        return res.status(400).json({ message: "Sector code must be uppercase." });
+                    }
+
+                    const sectorConfigName = Sectors[newSector.code];
+
+                    if (!sectorConfigName) {
+                        return res.status(404).json({ message: `sector '${newSector.code}' is not available in the sector list.` });
+                    }
+
+                    let sector = gas.sectors.find(s => s.code === newSector.code);
+                    
+                    if (!sector) {
+                        sector = new Sector({
+                            name: sectorConfigName,
+                            code: newSector.code,
+                            value: newSector.value,
+                            percentage: newSector.percentage
+                        });
+                        gas.sectors.push(sector);
+                    } else {
+                        sector.name = sectorConfigName;
+                        sector.value = newSector.value || sector.value;
+                        sector.percentage = newSector.percentage || sector.percentage;
+                    }
+
+                    gas.sectors = gas.sectors.map(s => s.code === newSector.code ? sector : s);
+                }
+            }
+
+            emission.gases = emission.gases.map(g => g.code === newGas.code ? gas : g);
         }
 
-        // const emission = new Emission({
-        //     country: country_info._id,
-        //     year: year,
-        //     total_value: total_value,
-        //     percentage_from_1990: percent_from_1990,
-        //     gases: []
-        // });
+        await emission.save();
 
         res.status(201).json({ message: await emission.populate("country") });
     } catch (error) {
@@ -191,4 +259,5 @@ const CreateEmission = async (req, res) => {
 
 module.exports.GetEmissionByCountryAndYear = GetEmissionByCountryAndYear;
 module.exports.GetEmissionBySector = GetEmissionBySector;
+module.exports.GetEmissionTrendByCountry = GetEmissionTrendByCountry;
 module.exports.CreateEmission = CreateEmission;

@@ -1,11 +1,9 @@
 GET http://localhost:5000/api/countries
 
 ###
-
 GET http://localhost:5000/api/emissions?country=THA&year=1998
 
 ###
-
 POST http://localhost:5000/api/emissions
 Content-Type: application/json
 
@@ -19,19 +17,40 @@ Content-Type: application/json
     "gases": [
         {
             "name": "nus",
-            "code": "CO2"
+            "code": "CO2",
+            "total_value": 0,
+            "sectors": [
+                {
+                    "name": "eiei",
+                    "code": "AG",
+                    "value": 0
+                },
+                {
+                    "name": "Hello",
+                    "code": "TRAN"
+                },
+                {
+                    "name": "eiei",
+                    "code": "OTHX",
+                    "value": 0
+                }
+            ]
         },
         {
             "name": "hihi",
-            "code": "N20"
+            "code": "N2O"
         }
     ]
 }
 
 ###
-
 GET http://localhost:5000/api/emissions/sector?country=THA&year=1998
 
 ###
+GET http://localhost:5000/api/emissions/sector?country=THA&year=1998&gas=CO2
 
-GET http://localhost:5000/api/emissions/sector?country=THA&year=1998&gas=N2O
+###
+GET http://localhost:5000/api/emissions/trend?country=THA
+
+###
+GET http://localhost:5000/nus/sd/trend?country=THAdfasdf

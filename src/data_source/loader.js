@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const { ConnectDB, DeleteDB } = require("../config/db");
 
 const Country = require('../models/country');
@@ -9,7 +8,7 @@ const path = require("path");
 const csv = require('csv-parser');
 
 const csv_path = path.join(__dirname, "data", "data.csv");
-const config_path = path.join(__dirname, "config.json"); 
+const config_path = path.join(__dirname, "..", "config", "config.json"); 
 const config = JSON.parse(fs.readFileSync(config_path, "utf8"));
 
 const ParseSeriesCode = (data) => {
@@ -120,7 +119,6 @@ const ProcessRow = async (row, years) => {
             emission.gases = emission.gases.map(g => g.code === gas.code ? gas : g);
         }
 
-        console.log("Adding:", series_code, series_name, JSON.stringify(await emission.populate("country"), null, 2));
         await emission.save();
     }
 
@@ -133,6 +131,9 @@ const ProcessData = async (data) => {
         year: parseInt(header.split(" ")[0])
     }));
 
+    console.log("This process may take approximately 10 minutes.");
+    console.log("Uploading database to MongoDB...");
+
     const incompletedRow = [];
     for (const row of data) {
         if (!await ProcessRow(row, available_years)) {
@@ -144,16 +145,7 @@ const ProcessData = async (data) => {
         await ProcessRow(row, available_years);
     }
 
-    console.log("Processing Complete");
-
-    const country = await Country.findOne({ code: "THA" });
-    const sample = await Emission.findOne({ country: country._id, year: 1998 });
-    if (sample) {
-        console.log("Found:", JSON.stringify(await sample.populate("country"), null, 2));
-    } else {
-        console.log("Not Found");
-    }
-
+    console.log("Uploading Complete.");
     process.exit(0);
 };
 
@@ -167,7 +159,7 @@ const ReadCSV = async () => {
 
 const Start = async() => {
     try {
-        await DeleteDB();
+        // await DeleteDB();
         await ConnectDB();
         await ReadCSV(csv_path);
     } catch (error) {
@@ -175,33 +167,5 @@ const Start = async() => {
         process.exit(1);
     }
 };
-
-mongoose.connection.once("open", () => {
-    console.log("Connected to MongoDB");
-});
         
 Start();
-
-// EN.ATM.GHGT.ZG       Total greenhouse gasType emissions (% change from 1990)
-// EN.ATM.METH.AG.ZS    Agricultural methane emissions (% of total)
-// EN.ATM.NOXE.AG.ZS    Agricultural nitrous oxide emissions (% of total)
-// EN.ATM.CO2E.KT       CO2 emissions (kt)
-// EN.CO2.ETOT.ZS       CO2 emissions from electricity and heat production, total (% of total fuel combustion)
-// EN.CO2.MANF.ZS       CO2 emissions from manufacturing industries and construction (% of total fuel combustion)
-// EN.CO2.OTHX.ZS       CO2 emissions from other sectors, excluding residential buildings and commercial and public services (% of total fuel combustion)
-// EN.CO2.BLDG.ZS       CO2 emissions from residential buildings and commercial and public services (% of total fuel combustion)
-// EN.CO2.TRAN.ZS       CO2 emissions from transport (% of total fuel combustion)
-// EN.ATM.METH.EG.ZS    Energy related methane emissions (% of total)
-// EN.ATM.METH.ZG       Methane emissions (% change from 1990)
-// EN.ATM.HFCG.KT.CE    HFC gasType emissions (thousand metric tons of CO2 equivalent)
-// EN.ATM.NOXE.EG.ZS    Nitrous oxide emissions in energy sectorType (% of total)
-// EN.ATM.GHGT.KT.CE    Total greenhouse gasType emissions (kt of CO2 equivalent)
-// EN.ATM.SF6G.KT.CE    SF6 gasType emissions (thousand metric tons of CO2 equivalent)
-// EN.ATM.PFCG.KT.CE    PFC gasType emissions (thousand metric tons of CO2 equivalent)
-// EN.ATM.NOXE.ZG       Nitrous oxide emissions (% change from 1990)
-// EN.ATM.NOXE.KT.CE    Nitrous oxide emissions (thousand metric tons of CO2 equivalent)
-// EN.ATM.METH.EG.KT.CE Methane emissions in energy sectorType (thousand metric tons of CO2 equivalent)
-// EN.ATM.NOXE.EG.KT.CE Nitrous oxide emissions in energy sectorType (thousand metric tons of CO2 equivalent)
-// EN.ATM.METH.KT.CE    Methane emissions (kt of CO2 equivalent)
-// EN.ATM.METH.AG.KT.CE Agricultural methane emissions (thousand metric tons of CO2 equivalent)
-// EN.ATM.NOXE.AG.KT.CE Agricultural nitrous oxide emissions (thousand metric tons of CO2 equivalent)
