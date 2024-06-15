@@ -3,7 +3,7 @@
         "CO2":  { "code": "CO2", "name": "Carbon Dioxide" },
         "CO2E": { "code": "CO2", "name": "Carbon Dioxide" },
         "METH": { "code": "CH4", "name": "Methane" },
-        "NOXE": { "code": "N20", "name": "Nitrous Oxide" },
+        "NOXE": { "code": "N2O", "name": "Nitrous Oxide" },
         "HFCG": { "code": "HFC", "name": "Hydrofluorocarbon" },
         "SF6G": { "code": "SF6", "name": "Sulfur Hexafluoride" },
         "PFCG": { "code": "PFC", "name": "Perfluorocarbon" },

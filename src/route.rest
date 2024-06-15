@@ -1,0 +1,37 @@
+GET http://localhost:5000/api/countries
+
+###
+
+GET http://localhost:5000/api/emissions?country=THA&year=1998
+
+###
+
+POST http://localhost:5000/api/emissions
+Content-Type: application/json
+
+{
+    "country": {
+        "name": "Thailand",
+        "code": "THA"
+    },
+    "year": 12345,
+    "total_value": 1235845.45845,
+    "gases": [
+        {
+            "name": "nus",
+            "code": "CO2"
+        },
+        {
+            "name": "hihi",
+            "code": "N20"
+        }
+    ]
+}
+
+###
+
+GET http://localhost:5000/api/emissions/sector?country=THA&year=1998
+
+###
+
+GET http://localhost:5000/api/emissions/sector?country=THA&year=1998&gas=N2O
