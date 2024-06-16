@@ -5,7 +5,7 @@ const { GetAllCountries, CreateCountry } = require("../controllers/country_contr
 
 /**
  * @swagger
- * /api/country:
+ * /api/countries:
  *  get:
  *    tags:
  *    - Country Controller
@@ -35,7 +35,7 @@ Router.get("/", GetAllCountries);
 
 /**
  * @swagger
- * /api/country:
+ * /api/countries:
  *  post:
  *    tags:
  *    - Country Controller

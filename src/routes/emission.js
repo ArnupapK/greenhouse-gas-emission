@@ -10,7 +10,7 @@ const {
 
 /**
  * @swagger
- * /api/emission:
+ * /api/emissions:
  *  get:
  *    tags:
  *    - Emission Controller
@@ -50,7 +50,7 @@ Router.get("/", GetEmissionByCountryAndYear);
 
 /**
  * @swagger
- * /api/emission/sector:
+ * /api/emissions/sector:
  *  get:
  *    tags:
  *    - Emission Controller
@@ -110,7 +110,7 @@ Router.get("/sector", GetEmissionBySector);
 
 /**
  * @swagger
- * /api/emission/trend:
+ * /api/emissions/trend:
  *  get:
  *    tags:
  *    - Emission Controller
@@ -152,7 +152,7 @@ Router.get("/trend", GetEmissionTrendByCountry);
 
 /**
  * @swagger
- * /api/emission:
+ * /api/emissions:
  *  post:
  *    tags:
  *    - Emission Controller
