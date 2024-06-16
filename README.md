@@ -15,7 +15,7 @@ Create a `.env` file in the `src` directory and add the following environment va
 
 ```env
 DATABASE_URL=<your_mongo_connection_string>
-SERVER_PORT=5000
+SERVER_PORT=<your_server_port>
 DATABASE_FAILE=<your_database_file_in_csv_in_config_directory>
 
 Install Dependencies
@@ -42,9 +42,16 @@ To inject data from a CSV file into MongoDB, ensure the DATABASE_URL in .env fil
 
 This will build and start the Docker containers defined in docker-compose.inject-db.yml.
 
+Injecting Initial Data
+If you are running the application for the first time, you need to inject the initial data into the MongoDB database.
+    ./start.sh --inject-data
+
+This command uses Docker Compose to set up the MongoDB database and load initial data from a CSV file located in the src/data_source/data/ directory.
+
+
 API Documentation
 API documentation is available via Swagger UI. Once the application is running, navigate to:
-    http://localhost:5000/api-docs
+    http://localhost:<SERVER_PORT>/api-docs
 
 Routes
 Country Routes

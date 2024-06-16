@@ -227,52 +227,79 @@ Router.get("/trend", GetEmissionTrendByCountry);
  *            schema:
  *              type: object
  *              properties:
- *                country:
- *                  type: string
- *                  example: "USA"
- *                year:
- *                  type: number
- *                  example: 2020
- *                total_value:
- *                  type: number
- *                  example: 1000.5
- *                percentage_from_1990:
- *                  type: number
- *                  example: 5.0
- *                gases:
- *                  type: array
- *                  items:
- *                    type: object
- *                    properties:
- *                      name:
- *                        type: string
- *                        example: "Carbon Dioxide"
- *                      code:
- *                        type: string
- *                        example: "CO2"
- *                      total_value:
- *                        type: number
- *                        example: 500.5
- *                      percentage_from_1990:
- *                        type: number
- *                        example: 2.5
- *                      sectors:
- *                        type: array
- *                        items:
- *                          type: object
- *                          properties:
- *                            name:
- *                              type: string
- *                              example: "Transportation"
- *                            code:
- *                              type: string
- *                              example: "TRANS"
- *                            value:
- *                              type: number
- *                              example: 300.0
- *                            percentage:
- *                              type: number
- *                              example: 1.5
+ *                message:
+ *                  type: object
+ *                  properties:
+ *                    country:
+ *                      type: object
+ *                      properties:
+ *                        _id:
+ *                          type: string
+ *                          example: "666e584a18f6de5d775cb46c"
+ *                        name:
+ *                          type: string
+ *                          example: "Thailand"
+ *                        code:
+ *                          type: string
+ *                          example: "THA"
+ *                        __v:
+ *                          type: integer
+ *                          example: 0
+ *                    year:
+ *                      type: integer
+ *                      example: 12345
+ *                    total_value:
+ *                      type: number
+ *                      example: 1235845.45845
+ *                    percentage_from_1990:
+ *                      type: number
+ *                      example: null
+ *                    gases:
+ *                      type: array
+ *                      items:
+ *                        type: object
+ *                        properties:
+ *                          code:
+ *                            type: string
+ *                            example: "CO2"
+ *                          name:
+ *                            type: string
+ *                            example: "Carbon Dioxide"
+ *                          total_value:
+ *                            type: number
+ *                            example: 0
+ *                          percentage_from_1990:
+ *                            type: number
+ *                            example: null
+ *                          sectors:
+ *                            type: array
+ *                            items:
+ *                              type: object
+ *                              properties:
+ *                                code:
+ *                                  type: string
+ *                                  example: "AG"
+ *                                name:
+ *                                  type: string
+ *                                  example: "Agricultural"
+ *                                value:
+ *                                  type: number
+ *                                  example: 0
+ *                                percentage:
+ *                                  type: number
+ *                                  example: null
+ *                                _id:
+ *                                  type: string
+ *                                  example: "666e60041850d37ff78889e8"
+ *                          _id:
+ *                            type: string
+ *                            example: "666e60041850d37ff78889e6"
+ *                    _id:
+ *                      type: string
+ *                      example: "666e60041850d37ff78889e5"
+ *                    __v:
+ *                      type: integer
+ *                      example: 0
  *      400:
  *        description: Bad Request
  *      404:
