@@ -17,12 +17,10 @@ const App = express();
 App.use(BodyParser.json());
 App.use(BodyParser.urlencoded({ extended: true }));
 
-console.log(SwaggerSpec);
-App.use("/docs", SwaggerUi.serve, SwaggerUi.setup(SwaggerSpec));
+App.use("/api-docs", SwaggerUi.serve, SwaggerUi.setup(SwaggerSpec));
 
 App.use("/api/countries", CountryRoute);
 App.use("/api/emissions", EmissionRoute);
 App.use(NoHandlerRouter);
 
-
-App.listen(process.env.PORT || 5000);
+App.listen(process.env.SERVER_PORT || 5000);

@@ -5,57 +5,49 @@ const { GetAllCountries, CreateCountry } = require("../controllers/country_contr
 
 /**
  * @swagger
- * /api/countries:
- *   get:
- *     description: Get all countries
- *     parameters:
- *     - name: title
- *       description: title of the book
- *       in: formData
- *       required: true
- *       type: String
- *     responses:
- *       200:
- *         description: Success
- *       500:
- *         description: Error
+ * /api/country:
+ *  get:
+ *    tags:
+ *    - Country Controller
+ *    summary: Get all countries
+ *    responses:
+ *      200:
+ *        description: OK
+ *      404:
+ *        description: No Countries in database
+ *      500:
+ *        description: Server Error
  */
 Router.get("/", GetAllCountries);
 
 /**
  * @swagger
- * '/api/user/register':
+ * /api/country:
  *  post:
- *     tags:
- *     - User Controller
- *     summary: Create a user
- *     requestBody:
+ *    tags:
+ *    - Country Controller
+ *    summary: Create a new country
+ *    requestBody:
  *      required: true
  *      content:
  *        application/json:
- *           schema:
+ *          schema:
  *            type: object
  *            required:
- *              - username
- *              - email
- *              - password
+ *              - name
+ *              - code
  *            properties:
- *              username:
+ *              name:
  *                type: string
- *                default: johndoe 
- *              email:
+ *                example: "United States"
+ *              code:
  *                type: string
- *                default: johndoe@mail.com
- *              password:
- *                type: string
- *                default: johnDoe20!@
- *     responses:
+ *                example: "USA"
+ *    responses:
  *      201:
  *        description: Created
- *      409:
- *        description: Conflict
- *      404:
- *        description: Not Found
+ *      400:
+ *        description: Bad Request
  *      500:
  *        description: Server Error
  */

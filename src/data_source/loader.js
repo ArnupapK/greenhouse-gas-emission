@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require("path");
 const csv = require('csv-parser');
 
-const csv_path = path.join(__dirname, "data", "data.csv");
+const csv_path = path.join(__dirname, "data", process.env.DATABASE_FILE || "data.csv");
 const config_path = path.join(__dirname, "..", "config", "config.json"); 
 const config = JSON.parse(fs.readFileSync(config_path, "utf8"));
 

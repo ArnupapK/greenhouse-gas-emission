@@ -32,6 +32,10 @@ const GetEmissionByCountryAndYear = async (req, res) => {
             return res.status(400).json({ message: `Emission is not found for '${reqCountry}' and '${reqYear}'.` });
         }
 
+        if (!emission.total_value) {
+            return res.status(404).json({ message: `No emission data found for '${reqCountry}' and '${reqYear}.'` });
+        }
+
         res.status(200).json({ value: emission.total_value });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -250,6 +254,19 @@ const CreateEmission = async (req, res) => {
         }
 
         await emission.save();
+
+        // const response = await emission.populate("country").transform((doc, ret) => {
+        //     delete ret._id;
+        //     delete ret.__v;
+        //     delete ret.country._id;
+        //     delete ret.__v;
+        //     ret.gases.forEach(gas => {
+        //         delete gas._id;
+        //         gas.sectors.forEach(sector => {
+        //             delete sector._id;
+        //         });
+        //     });
+        // });
 
         res.status(201).json({ message: await emission.populate("country") });
     } catch (error) {

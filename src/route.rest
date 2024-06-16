@@ -1,6 +1,15 @@
 GET http://localhost:5000/api/countries
 
 ###
+POST http://localhost:5000/api/countries
+Content-Type: application/json
+
+{
+    "name": "Thailand",
+    "code": "THA"
+}
+
+###
 GET http://localhost:5000/api/emissions?country=THA&year=1998
 
 ###
@@ -16,12 +25,12 @@ Content-Type: application/json
     "total_value": 1235845.45845,
     "gases": [
         {
-            "name": "nus",
+            "name": "Carbon Dioxide",
             "code": "CO2",
             "total_value": 0,
             "sectors": [
                 {
-                    "name": "eiei",
+                    "name": "Haidilao",
                     "code": "AG",
                     "value": 0
                 },
@@ -30,14 +39,14 @@ Content-Type: application/json
                     "code": "TRAN"
                 },
                 {
-                    "name": "eiei",
+                    "name": "Kagonoya",
                     "code": "OTHX",
                     "value": 0
                 }
             ]
         },
         {
-            "name": "hihi",
+            "name": "Nitrous Oxide",
             "code": "N2O"
         }
     ]
@@ -53,4 +62,4 @@ GET http://localhost:5000/api/emissions/sector?country=THA&year=1998&gas=CO2
 GET http://localhost:5000/api/emissions/trend?country=THA
 
 ###
-GET http://localhost:5000/nus/sd/trend?country=THAdfasdf
+GET http://localhost:5000/nus/sd/trend?country=THAdfasdf&asdbasd=jhsadf
