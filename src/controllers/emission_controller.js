@@ -54,10 +54,12 @@ const GetEmissionBySector = async (req, res) => {
         return res.status(400).json({ message: "year must be number." });
     }
 
-    if (reqGas.length !== 3 || reqGas !== reqGas.toUpperCase()) {
-        return res.status(400).json({ message: "gas must be exactly 3 characters long and uppercase." });
+    if (reqGas) {
+        if (reqGas.length !== 3 || reqGas !== reqGas.toUpperCase()) {
+            return res.status(400).json({ message: "gas must be exactly 3 characters long and uppercase." });
+        }
     }
-
+        
     try {
         const country = await Country.findOne({
             $or: [ { name: reqCountry }, { code: reqCountry } ]

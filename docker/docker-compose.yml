@@ -17,7 +17,7 @@ services:
     container_name: emissions-server
     image: emissions-server
     tty: true
-    # restart: always
+    restart: always
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
